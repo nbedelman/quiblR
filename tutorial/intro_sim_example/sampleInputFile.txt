@@ -1,13 +1,13 @@
 [Input]
-treefile: ./introSim.nwk
+treefile: ./null_1000000_0.2.trees
 numdistributions: 2
 likelihoodthresh: 0.01
-numsteps: 30
+numsteps: 50
 gradascentscalar: 0.5
 totaloutgroup: 4
 multiproc: True
-Maxcores:4
+Maxcores:100
 
 
 [Output]
-OutputPath: ./introSim.quibl
+OutputPath: ./null_1000000_0.2.quibl

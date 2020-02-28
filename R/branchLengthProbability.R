@@ -86,9 +86,10 @@ locusStats <- function(tree,tripFrame, overallOut){
 }
 
 #' @export
-getPerLocusStats <- function(quiblOutput,triplet,treeList, overallOut){
+getPerLocusStats <- function(quiblOutput,trip,treeList, overallOut){
   #first, extract the appropriate rows from the full quibl output
-  thisTriplet <- subset(quiblOutput,triplet==triplet)
+  thisTriplet <- subset(quiblOutput,triplet==trip)
+  #print(thisTriplet)
   perLocusOut <- data.frame(tree=character(),out=character(),branchLength=numeric(),introProb=numeric())
   for (i in seq(1,length(treeList))){
     perLocusOut <- rbind(perLocusOut,locusStats(treeList[[i]],thisTriplet, overallOut))

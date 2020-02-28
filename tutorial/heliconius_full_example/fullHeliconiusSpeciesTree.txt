@@ -1,0 +1,1 @@
+(Etal,(((Hsar,Hdem),(Htel,(Hhsa,(Hhim,HeraHhimHyb,(HeraRef,HeraDisco))))),(Ldor,((Hnum,Hbes,Hpar),((HmelRef,HmelDisco),(Htim,Hcyd))))));
