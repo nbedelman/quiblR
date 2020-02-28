@@ -1,13 +1,13 @@
 [Input]
-treefile: ./Small_Test_Example/smallTestTrees.txt
+treefile: ./introSim.nwk
 numdistributions: 2
 likelihoodthresh: 0.01
-numsteps: 60
+numsteps: 30
 gradascentscalar: 0.5
 totaloutgroup: 4
 multiproc: True
-maxcores:1000
+Maxcores:4
 
 
 [Output]
-OutputPath: ./testOut.csv
+OutputPath: ./introSim.quibl

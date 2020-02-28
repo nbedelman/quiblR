@@ -67,26 +67,31 @@ getTotalMixtureDist <- function(xmin,xmax,quiblRow){
 #' @export
 findOutgroup <- function(tripletTree){
   for (tip in tripletTree$tip.label){
-    if (ape::is.monophyletic(tripletTree,setdiff(tip,tripletTree$tip.label))){
+    if (ape::is.monophyletic(tripletTree,setdiff(tripletTree$tip.label,tip))){
       return (tip)
     }
   }
 }
 
 #' @export
-locusStats <- function(tree,tripFrame){
-  testTree <- extractTripletTree(tree,unique(tripFrame$triplet))
+locusStats <- function(tree,tripFrame, overallOut){
+  triplet <- unlist(strsplit(unique(as.character(tripFrame$triplet)),"_"))
+  tree <- root(tree,overallOut)
+  testTree <- extractTripletTree(tree,triplet)
   outgroup <- findOutgroup(testTree)
   branchLength <- ape::dist.nodes(testTree)[4,5]
-  introProb <- getSingleProb(outgroup, tripFrame[which(tripFrame$outgroup==outgroup),],"nonILSMix")
-  ILSProb <- getSingleProb(outgroup, tripFrame[which(tripFrame$outgroup==outgroup),],"ILSMix")
-  return(data.frame(tree=tree,out=outgroup,branchLength=branchLength,introProb=introProb/(introProb+ILSProb)))
+  introProb <- getSingleProb(branchLength, tripFrame[which(tripFrame$outgroup==outgroup),],"nonILSMix")
+  ILSProb <- getSingleProb(branchLength, tripFrame[which(tripFrame$outgroup==outgroup),],"ILSMix")
+  return(data.frame(tree=write.tree(testTree),out=outgroup,branchLength=branchLength,introProb=introProb/(introProb+ILSProb)))
 }
 
 #' @export
-getPerLocusStats <- function(quiblOutput,triplet,treeList){
+getPerLocusStats <- function(quiblOutput,triplet,treeList, overallOut){
   #first, extract the appropriate rows from the full quibl output
   thisTriplet <- subset(quiblOutput,triplet==triplet)
-  perLocusOut <- sapply(treeList,locusStats,tripFrame=thisTriplet)
+  perLocusOut <- data.frame(tree=character(),out=character(),branchLength=numeric(),introProb=numeric())
+  for (i in seq(1,length(treeList))){
+    perLocusOut <- rbind(perLocusOut,locusStats(treeList[[i]],thisTriplet, overallOut))
+  }
   return(perLocusOut)
 }

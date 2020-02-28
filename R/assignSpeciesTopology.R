@@ -39,6 +39,5 @@ isDiscordant <- function(quiblRow,sTree){
 #'
 #'
 extractTripletTree <- function(fullTree,triplet){
-
   return(ape::drop.tip(fullTree,setdiff(fullTree$tip.label,triplet)))
 }
