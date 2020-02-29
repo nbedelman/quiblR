@@ -12,5 +12,6 @@ LazyData: true
 Imports:
 	ggplot2, 
 	dplyr, 
-	ape
+	ape,
+	hash
 RoxygenNote: 7.0.2

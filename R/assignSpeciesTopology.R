@@ -21,9 +21,10 @@ assignSpeciesTopology <- function(quiblOutput,speciesTree){
 #'
 
 isSpeciesTree <- function(quiblRow,sTree){
-  triplet <- unlist(strsplit(as.character(quiblRow[1]),"_"))
+  quiblRow <- as.vector(quiblRow)
+  triplet <- unlist(strsplit(as.character(quiblRow[[1]]),"_"))
   testTree <- extractTripletTree(sTree,triplet)
-  return(ape::is.monophyletic(testTree,setdiff(triplet,as.character(quiblRow[2]))))
+  return(ape::is.monophyletic(testTree,setdiff(triplet,as.character(quiblRow[[2]]))))
 }
 
 #' @export

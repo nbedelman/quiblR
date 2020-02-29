@@ -224,3 +224,23 @@ speciesMixDist <- ggplot(data=subset(Hsa_Htel_Hera_LocusStats, out=="Htel"))+
 ggarrange(speciesILSOnlyDist, speciesMixDist,
           ncol = 2, nrow = 1)
 ```
+
+OK, that actually looks pretty good! probably because there's really not much, if any, ILS here. But that's just one triplet. We have quite a few more, and we'd like to get a sense of whish ones are impacted by gene flow. For that, we need a summary. We'll use quiblR's getSummaryMatrix function. This will return a data frame with the average introgression fraction for each pair of taxa. Specifically, it goes triplet by triplet, ignores topologies concordant withthe species tree, and records mixprop2*count/total trees, and averages that value across all tests that include each pair of species.
+
+```{r get correlations}
+introgressionSummary <- getSummaryMatrix(largeQuiblOutput,largeSpeciesTree)
+head(introgressionSummary)
+```
+We can now make a heatmap of these relationships.
+
+``` {r correlation heatmap}
+ggplot(data = introgressionSummary, aes(tax1, tax2, fill = value))+
+ geom_tile(color = "white")+
+ scale_fill_gradient2(low = "white", high = "red", mid = "yellow", 
+   midpoint = max(introgressionSummary$value)/2, limit = c(0,max(introgressionSummary$value)), space = "Lab", 
+   name="Average introgression fraction") +
+  theme_bw()+
+ theme(axis.text.x = element_text(angle = 45, vjust = 1, 
+    size = 12, hjust = 1))+
+ coord_fixed()
+```
