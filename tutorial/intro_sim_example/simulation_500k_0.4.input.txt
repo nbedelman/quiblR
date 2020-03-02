@@ -1,0 +1,13 @@
+[Input]
+treefile: ./null_500000_0.4.trees
+numdistributions: 2
+likelihoodthresh: 0.01
+numsteps: 50
+gradascentscalar: 0.5
+totaloutgroup: 4
+multiproc: True
+Maxcores:100
+
+
+[Output]
+OutputPath: ./null_500000_0.4.quibl

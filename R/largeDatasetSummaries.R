@@ -6,24 +6,24 @@
 #' @export
 #'
 
-getSummaryMatrix <- function(quiblOut,speciesTree,summaryType="mean"){
-correlationDict <- hash()
+getIntrogressionSummary <- function(quiblOut,speciesTree,summaryType="mean"){
+  species <- unique(quiblOut[,"outgroup"])
+  orderedSpecies <- factor(species, levels=speciesTree$tip.label)
+  correlationDict <- makeEmptyHash(orderedSpecies)
+
 for (row in 1:nrow(quiblOut)){
   numTrees <- sum(quiblOut[which(quiblOut$triplet==unique(quiblOut$triplet)[1]),]$count)
   taxa <- setdiff(unlist(strsplit(as.character(quiblOut[row,][,"triplet"]),"_")),quiblOut[row,][,"outgroup"])
-  key <- paste(sort(taxa)[1], sort(taxa)[2],sep = "_")
+  key1 <- paste(sort(taxa)[1], sort(taxa)[2],sep = "_")
+  key2 <- paste(sort(taxa)[2], sort(taxa)[1],sep = "_")
   if(! isSpeciesTree(quiblOut[row,],speciesTree)){
-    if (key %in% keys(correlationDict)){
-      correlationDict[[key]] <- append(correlationDict[[key]],quiblOut[row,][,"mixprop2"]*quiblOut[row,][,"count"]/numTrees)
+    if (key1 %in% keys(correlationDict)){
+      correlationDict[[key1]] <- append(correlationDict[[key1]],quiblOut[row,][,"mixprop2"]*quiblOut[row,][,"count"]/numTrees)
     } else {
-      correlationDict[[key]] <- c(quiblOut[row,][,"mixprop2"]*quiblOut[row,][,"count"]/numTrees)
+      correlationDict[[key2]] <- append(correlationDict[[key2]],quiblOut[row,][,"mixprop2"]*quiblOut[row,][,"count"]/numTrees)
     }
   }
 }
-
-# mat <- matrix(NA, nrow=length(unique(quiblOut[,"outgroup"])),
-#               ncol=length(unique(quiblOut[,"outgroup"])),
-#               dimnames=list(unique(quiblOut[,"outgroup"]),unique(quiblOut[,"outgroup"])))
 
 inp <- data.frame(tax1=character(),tax2=character(), value=numeric())
 for(k in keys(correlationDict)){
@@ -31,10 +31,22 @@ for(k in keys(correlationDict)){
                                tax2=unlist(strsplit(k,"_"))[2],
                                value=mean(correlationDict[[k]])))
 }
-
-# inp.mtx <- as.matrix(inp)
-# mat[inp.mtx[,1:2] ] <- as.numeric(inp.mtx[,3])
-
+inp[,"tax1"] <- factor(inp[,"tax1"], levels = speciesTree$tip.label)
+inp[,"tax2"] <- factor(inp[,"tax2"], levels = speciesTree$tip.label)
+inp[,"value"][is.na(inp[,"value"])] <- 0
 return(inp)
 }
+
+makeEmptyHash <- function(labels){
+  out <- hash()
+  for (lab1 in 1:(length(labels))){
+    for (lab2 in (lab1):length(labels)){
+      thisLab <- paste(labels[lab1],labels[lab2],sep="_")
+      out[[thisLab]] <- numeric()
+    }
+  }
+  return(out)
+}
+
+
 
