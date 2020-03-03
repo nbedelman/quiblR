@@ -1,8 +1,8 @@
 [Input]
 treefile: ./null_500000_0.4.trees
 numdistributions: 2
-likelihoodthresh: 0.01
-numsteps: 50
+likelihoodthresh: 0.005
+numsteps: 75
 gradascentscalar: 0.5
 totaloutgroup: 4
 multiproc: True
