@@ -27,8 +27,9 @@ for (row in 1:nrow(quiblOut)){
 
 inp <- data.frame(tax1=character(),tax2=character(), value=numeric())
 for(k in keys(correlationDict)){
-  inp <- rbind(inp, data.frame(tax1=unlist(strsplit(k,"_"))[1],
-                               tax2=unlist(strsplit(k,"_"))[2],
+  taxa <- sort(unlist(strsplit(k,"_"))[1:2])
+  inp <- rbind(inp, data.frame(tax1=taxa[1],
+                               tax2=taxa[2],
                                value=mean(correlationDict[[k]])))
 }
 inp[,"tax1"] <- factor(inp[,"tax1"], levels = speciesTree$tip.label)
