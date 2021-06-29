@@ -35,6 +35,7 @@ for(k in keys(correlationDict)){
 inp[,"tax1"] <- factor(inp[,"tax1"], levels = speciesTree$tip.label)
 inp[,"tax2"] <- factor(inp[,"tax2"], levels = speciesTree$tip.label)
 inp[,"value"][is.na(inp[,"value"])] <- 0
+inp <- inp[order(inp[["tax1"]], inp[["tax2"]]),]
 return(inp)
 }
 
