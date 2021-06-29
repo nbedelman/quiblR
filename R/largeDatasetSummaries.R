@@ -32,8 +32,8 @@ for(k in keys(correlationDict)){
                                tax2=rev(taxa),
                                value=rep(mean(correlationDict[[k]]),2)))
 }
-inp[,"tax1"] <- factor(inp[,"tax1"], levels = speciesTree$tip.label[which(inp[,"tax2"] %in% speciesTree$tip.label),])
-inp[,"tax2"] <- factor(inp[,"tax2"], levels = speciesTree$tip.label[which(inp[,"tax2"] %in% speciesTree$tip.label),])
+inp[,"tax1"] <- factor(inp[,"tax1"], levels = speciesTree$tip.label[which(speciesTree$tip.label %in% inp[,"tax1"]),])
+inp[,"tax2"] <- factor(inp[,"tax2"], levels = speciesTree$tip.label[which(speciesTree$tip.label %in% inp[,"tax2"]),])
 inp[,"value"][is.na(inp[,"value"])] <- 0
 inp <- inp[order(inp[["tax1"]], inp[["tax2"]]),]
 return(inp)
