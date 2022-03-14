@@ -3,8 +3,8 @@ title: "QuIBL analysis tutorial"
 author: "Nate Edelman"
 date: "3/02/2020"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r global_options, message=FALSE, warning=FALSE, include=FALSE}
@@ -16,7 +16,7 @@ This is a tutorial for how to analyze output from the Quantifying Introgression 
 To run QuIBL with a sample dataset, navigate to the directory where quiblR is cloned. We'll start with the data in tutorial/intro_sim_example
 
 ```{bash, eval = FALSE}
-cd "/Users/nbedelman/Dropbox (Harvard University)/quiblR/"
+cd "/Users/nbedelman/Dropbox/quiblR/"
 cd tutorial/intro_sim_example
 ```
 
