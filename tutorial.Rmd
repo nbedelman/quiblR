@@ -2,7 +2,9 @@
 title: "QuIBL analysis tutorial"
 author: "Nate Edelman"
 date: "3/02/2020"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r global_options, message=FALSE, warning=FALSE, include=FALSE}
@@ -13,8 +15,8 @@ This is a tutorial for how to analyze output from the Quantifying Introgression 
 
 To run QuIBL with a sample dataset, navigate to the directory where quiblR is cloned. We'll start with the data in tutorial/intro_sim_example
 
-```{shell navigate to quibl directory, eval = FALSE}
-cd <path_to_quiblR>
+```{bash, eval = FALSE}
+cd "/Users/nbedelman/Dropbox (Harvard University)/quiblR/"
 cd tutorial/intro_sim_example
 ```
 
@@ -23,14 +25,14 @@ Open the file "sampleInputFile.txt" in your text editor of choice
 We can see that QuIBL is very simple to run; all we need is a file that has a list of gene trees (one per line), and a taxon that we can use to root the trees ("totalOutgroup"). The rest of the parameters are described at <http://github.com/michaelmiyagi/QuIBL>, but we don't need to mess with them now. To run QuIBL, supply whatever output name you'd like as the "OutputPath", then return to terminal. From the tutorial/intro_sim_example directory, run
 
 ```{bash run QuILB, eval = FALSE}
-python <path_to_QuIBL>/QuIBL.py sampleInputFile.txt  
+#python <path_to_QuIBL>/QuIBL.py sampleInputFile.txt  
 ```
 
 This will take a while, so feel free to run it, but we've also supplied the output here, so you can continue with the tutorial while you wait. Everything that follows should be run in R
 
 ## Output Data Analysis
 
-First, we'll set up our environment. 
+First, we'll set up our environment.
 ```{r load packages}
 suppressMessages(library("quiblR"))
 suppressMessages(library("ggplot2"))
@@ -89,11 +91,11 @@ The internal branch length in the two-ditribution model. If the topology is conc
 
 **mixprop2**
 
-Under the two-ditribution model, the proportion of loci that have a history of introgression 
+Under the two-ditribution model, the proportion of loci that have a history of introgression
 
 **mixprop1**
 
-Under the two-ditribution model, the proportion of loci that have a history of ILS 
+Under the two-ditribution model, the proportion of loci that have a history of ILS
 
 **lambda2Dist**
 
@@ -115,7 +117,7 @@ The Bayesian Information Criteria for the fit of the data to the ILS only model
 
 **count**
 
-The number of loci that have this topology. 
+The number of loci that have this topology.
 
 ## Get some big-picture results
 
@@ -191,11 +193,11 @@ ggarrange(outgroup1_ILSOnlyDist, outgroup1_MixDist,outgroup1_decomp,
 
 ```
 
-Not perfect, but not bad! Clearly, the ILS only model is a poor fit for our data. We can tell there are two peaks in our data, not a simple exponential decay. Looking at the sum of the mixture model (which is what we expect to observe), we can see that the introgression distribution nicely fits the right side of our data, though the peak is slightly overestimated. 
+Not perfect, but not bad! Clearly, the ILS only model is a poor fit for our data. We can tell there are two peaks in our data, not a simple exponential decay. Looking at the sum of the mixture model (which is what we expect to observe), we can see that the introgression distribution nicely fits the right side of our data, though the peak is slightly overestimated.
 
 So, why are we off, even if the 2-distribution model is clearly better than the ILS only? It could be a number of reasons. First, we have a finite number of datapoints here, but we're fitting a continuous model. We've tried to illustrate this limitation by plotting our data as a histogram instead of a smoothed density distribution so you can see how blocky it is. Second, though the sequences were simulated, we did then estimate the gene tree branch lengths with PhyML. That introduces some error as well.
 
-We can follow this up by looking at the distribution of branch lengths that we expect to only arise due to ILS. There are many fewer of these, but we can still see if the distribution looks reasonable. 
+We can follow this up by looking at the distribution of branch lengths that we expect to only arise due to ILS. There are many fewer of these, but we can still see if the distribution looks reasonable.
 
 ```{r ILS topology branch lengths with distributions, echo=FALSE}
 ILStop_ILSOnly <-  getILSOnlyDist(0,0.1,subset(quiblOutput, outgroup=="2" & triplet=="1_2_3"))
@@ -211,7 +213,7 @@ outgroup2_ILSOnlyDist
 
 
 ## Larger datasets
-This was a relatively simple, compact example, but what happens when we are analyzing a broader clade? Let's load in some real data from Edelman et al 2019. 
+This was a relatively simple, compact example, but what happens when we are analyzing a broader clade? Let's load in some real data from Edelman et al 2019.
 
 ```{r input largeClade Data}
 largeSpeciesTree <- read_speciesTree("tutorial/heliconius_full_example/fullHeliconiusSpeciesTree.txt")
@@ -225,14 +227,14 @@ Again, we'll add our useful columns as above.
 ```{r format largeClade Data}
 totalTrees <- sum(largeQuiblOutput$count)/length(unique(largeQuiblOutput$triplet))
 
-largeQuiblOutput <- mutate(largeQuiblOutput, 
-                           isDiscordant = as.integer(! apply(largeQuiblOutput, 1, isSpeciesTree, sTree=largeSpeciesTree)), 
+largeQuiblOutput <- mutate(largeQuiblOutput,
+                           isDiscordant = as.integer(! apply(largeQuiblOutput, 1, isSpeciesTree, sTree=largeSpeciesTree)),
                            isSignificant = as.integer(apply(largeQuiblOutput, 1, testSignificance, threshold=10)),
                            totalIntrogressionFraction=(mixprop2*count*isDiscordant)/totalTrees)
 head(largeQuiblOutput)
 ```
 
-Now, we have lots of results...60 rows in all. That's not quite as easy to make sense of as a data frame, so let's try to summarize the data. We'll use quiblR's getIntrogressionSummary function. This will return a data frame with the average introgression fraction for each pair of taxa. Specifically, it goes triplet by triplet, ignores topologies concordant withthe species tree, and records mixprop2*count/total trees, and averages that value across all tests that include each pair of species. 
+Now, we have lots of results...60 rows in all. That's not quite as easy to make sense of as a data frame, so let's try to summarize the data. We'll use quiblR's getIntrogressionSummary function. This will return a data frame with the average introgression fraction for each pair of taxa. Specifically, it goes triplet by triplet, ignores topologies concordant with the species tree, and records mixprop2*count/total trees, and averages that value across all tests that include each pair of species.
 
 ```{r get correlations}
 introgressionSummary <- getIntrogressionSummary(largeQuiblOutput,largeSpeciesTree)
@@ -246,7 +248,7 @@ We can now make a heatmap of these relationships.
 summaryMatrix <- ggplot(data = introgressionSummary, aes(tax1, tax2, fill = value))+
  geom_tile(color = "white")+
  scale_fill_gradient2(low = "white", high = "red", mid = "yellow",na.value = "grey50",
-   midpoint = max(introgressionSummary$value)/2, limit = c(0,max(introgressionSummary$value)), 
+   midpoint = max(introgressionSummary$value)/2, limit = c(0,max(introgressionSummary$value)),
    name="Average introgression fraction") +
 geom_abline(slope = 1, intercept=0)+
   geom_vline(xintercept=seq(1.5,nrow(introgressionSummary)+0.5,1), alpha=0.6)+
@@ -254,7 +256,7 @@ geom_abline(slope = 1, intercept=0)+
   labs(x="", y="")+
   #scale_x_discrete(position = "top") +
  theme(panel.grid = element_blank(),legend.position = "none")
-   
+
 
 #summaryMatrix
 
@@ -278,7 +280,7 @@ subset(largeQuiblOutput, triplet=="HeraRef_Hhsa_Htel")
 Hhsa_Htel_Hera_LocusStats <- getPerLocusStats(quiblOutput = largeQuiblOutput, trip = "HeraRef_Hhsa_Htel", treeList = largeOriginalTrees, overallOut="HmelRef")
 head(Hhsa_Htel_Hera_LocusStats)
 ```
-Next, we'll generate the distributions 
+Next, we'll generate the distributions
 
 ```{r get Hhsa_Htel_Hera Distributions}
 Hhsa_Htel_Hera_ILSOnly <- getILSOnlyDist(0,0.1,subset(largeQuiblOutput, outgroup=="Htel" & triplet=="HeraRef_Hhsa_Htel"))
@@ -308,5 +310,3 @@ ggarrange(speciesILSOnlyDist, speciesMixDist,
 ```
 
 OK, that looks pretty good! We can be confident in our estimated introgression fraction.
-
-
